@@ -5,11 +5,14 @@ import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('user', () => {
 
-    const token = ref('')
+    const userToken = ref<string>('')
+
+    const userInfo = ref()
 
     return {
-        token
+        userToken,
+        userInfo
     }
-},{
+}, {
     persist: true
 })

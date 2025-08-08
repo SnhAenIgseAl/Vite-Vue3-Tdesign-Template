@@ -1,33 +1,67 @@
+import { MessagePlugin } from 'tdesign-vue-next';
+import { API_URL } from '@/config/request.config'
+import { store } from '@/stores/index'
+import { useUserStore } from '@/stores/modules/user';
+
+const userStore = useUserStore(store)
+
+interface HttpError {
+    [key: number]: string
+}
+
+// http错误码
+const httpErrCode: HttpError = {
+    400: '请求错误',
+    401: '请登录再操作',
+    403: '拒绝访问',
+    404: '请求地址不存在',
+    500: '服务器错误'
+}
+
 /**
  * fetch
  */
-interface fetchCfg {
-    options?: RequestInit
-}
-
 export const useFetch = (
     url: string,
-    timeout: 5000 | number | undefined,
-    fetchCfg?: fetchCfg
+    option?: RequestInit,
+    timeout?: number,
 ) => {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<unknown>((resolve, reject) => {
 
+        const timer = timeout || 5000
+
+        // 请求超时
         const timeoutId = setTimeout(() => {
             reject(new Error("请求超时"));
-        }, timeout);
+        }, timer);
 
-        fetch(url, fetchCfg?.options)
+        // 有用户token就带上
+        if (option.headers) {
+            option.headers = {
+                ...option.headers,
+                'Authorization': 'Bearer ' + userStore.userToken,
+            }
+        }
+
+        fetch(API_URL + url, option)
             .then(res => {
-                clearTimeout(timeoutId);
-                res.json()
+                console.log(res);
+                
+                if (res.ok) {
+                    return res.json()
+                } else {
+                    const errCode = res.status
+                    MessagePlugin.error(httpErrCode[errCode] || '未知错误')
+                }
             })
             .then(res => {
-                clearTimeout(timeoutId);
                 resolve(res)
             })
             .catch(err => {
-                clearTimeout(timeoutId);
                 reject(err)
+            })
+            .finally(() => {
+                clearTimeout(timeoutId)
             })
     })
 }

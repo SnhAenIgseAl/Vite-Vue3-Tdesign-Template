@@ -1,27 +1,23 @@
-import { createWebHistory, createRouter } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 
-
-const routes = [
+const routes: RouteRecordRaw[] = [
 	{
 		path: '/',
 		redirect: '/index'
     },
     {
 		path: '/index',
-		component: () => import('@/Index/Index.vue')
-    }
+		name: 'index',
+		component: () => import('@/views/Index/Index.vue')
+	}
 ]
 
 
 
 const router = createRouter({
 	history: createWebHistory(),
-	routes,
-	scrollBehavior() {
-		// 切换页面时回到顶部
-		return { top: 0 }
-	},
+	routes: routes,
 })
 
 
