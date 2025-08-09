@@ -1,5 +1,4 @@
 <template>
-    <!-- <t-button>确定</t-button> -->
     <t-typography-title 
         v-for="(item, index) in 6" 
         :key="index"
@@ -9,8 +8,14 @@
 </template>
 
 <script setup lang="ts">
+import userApi from '@/api/user'
 
-console.log('测试文字')
+userApi.login({
+    username: 'admin',
+    password: '123456'
+}).then(res => {
+    console.log(res)
+})
 
 </script>
 

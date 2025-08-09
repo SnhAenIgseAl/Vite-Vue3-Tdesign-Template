@@ -1,4 +1,4 @@
-import { useFetch } from '../utils/useRequest'
+import { useFetch } from '../utils/request'
 
 export const login = ({
     username,
@@ -22,3 +22,9 @@ export const login = ({
         })
     })
 }
+
+const userApi = {
+    login
+}
+
+export default userApi

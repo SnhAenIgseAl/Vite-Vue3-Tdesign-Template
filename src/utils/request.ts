@@ -1,5 +1,5 @@
 import { MessagePlugin } from 'tdesign-vue-next';
-import { API_URL } from '@/config/request.config'
+import { API_URL } from '@/config/request'
 import { store } from '@/stores/index'
 import { useUserStore } from '@/stores/modules/user';
 
@@ -52,12 +52,14 @@ export const useFetch = (
                 } else {
                     const errCode = res.status
                     MessagePlugin.error(httpErrCode[errCode] || '未知错误')
+                    reject(res.statusText)
                 }
             })
             .then(res => {
                 resolve(res)
             })
             .catch(err => {
+                MessagePlugin.error('网络错误')
                 reject(err)
             })
             .finally(() => {
