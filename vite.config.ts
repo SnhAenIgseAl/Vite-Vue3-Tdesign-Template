@@ -16,6 +16,8 @@ export default defineConfig({
             resolvers: [TDesignResolver({
                 library: 'vue-next'
             })],
+            imports: ["vue", "vue-router"],
+            dts: "src/types/auto-imports.d.ts"
             // resolvers: [ElementPlusResolver()],
         }),
         Components({

@@ -5,10 +5,13 @@
         :level="`h${item}`">
         H{{item}}. TDesign
     </t-typography-title>
+    {{ username }}
 </template>
 
 <script setup lang="ts">
 import userApi from '@/api/user'
+
+const username = ref('测试文字')
 
 userApi.login({
     username: 'admin',

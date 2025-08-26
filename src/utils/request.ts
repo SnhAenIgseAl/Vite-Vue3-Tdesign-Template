@@ -1,7 +1,7 @@
 import { MessagePlugin } from 'tdesign-vue-next';
-import { API_URL } from '@/config/request'
+import { API_URL } from '@/config/request.config'
 import { store } from '@/stores/index'
-import { useUserStore } from '@/stores/modules/user';
+import { useUserStore } from '@/stores';
 
 const userStore = useUserStore(store)
 
