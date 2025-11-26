@@ -1,11 +1,20 @@
 <template>
-    <t-typography-title 
-        v-for="(item, index) in 6" 
-        :key="index"
-        :level="`h${item}`">
-        H{{item}}. TDesign
-    </t-typography-title>
-    {{ username }}
+
+    <div class="flex flex-col flex-center">
+        <t-typography-title 
+            v-for="(item, index) in 6" 
+            :key="index"
+            :level="`h${item}`"
+        >
+            H{{item}}. TDesign
+        </t-typography-title>
+
+        <div class="px-2 py-1 rounded-md text-zinc-50 bg-sky-500" >
+            {{ username }}
+        </div>
+       
+    </div>
+    
 </template>
 
 <script setup lang="ts">
