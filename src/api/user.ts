@@ -1,26 +1,26 @@
-import { useFetch } from '../utils/request'
+import { fetchData } from '../utils/request'
 
-export const login = ({
+export const login = async ({
     username,
     password
 }: {
     username: string
     password: string
 }) => {
-    return new Promise((resolve, reject) => {
-        useFetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username,
-                password
-            })
-        }).then(res => {
-            resolve(res)
-        })
+    const { data, error } = await fetchData('/api/login', {
+        method: 'GET',
+        headers: {
+            'foo': 'bar',
+        },
+        query: {
+            't': new Date().getTime().toString(),
+        },
+        body: {
+            username,
+            password
+        }
     })
+    return data.value
 }
 
 const userApi = {

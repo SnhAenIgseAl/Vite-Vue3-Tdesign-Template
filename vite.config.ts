@@ -42,4 +42,13 @@ export default defineConfig({
     esbuild: {
         // drop: ['console', 'debugger'],
     },
+    server: {
+        proxy: {
+            '/api': {
+                target: 'https://api.galleryimg.top/api',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, '')
+            }
+        }
+    }
 })
