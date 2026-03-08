@@ -1,71 +1,104 @@
-import { MessagePlugin } from 'tdesign-vue-next';
-import { API_URL } from '@/config/request.config'
-import { store } from '@/stores/index'
-import { useUserStore } from '@/stores';
+import { useUserStore } from '@/stores'
 
-const userStore = useUserStore(store)
-
-interface HttpError {
-    [key: number]: string
+const getUserStore = async () => {
+    return useUserStore()
 }
 
-// http错误码
-const httpErrCode: HttpError = {
-    400: '请求错误',
-    401: '请登录再操作',
-    403: '拒绝访问',
-    404: '请求地址不存在',
-    500: '服务器错误'
+interface ResponseError {
+    status: number,
+    statusText: string,
+    data: any
+}
+
+interface OnRequestParamas {
+    url: string,
+    headers: Record<string, any>
+}
+
+interface RequestOption extends Omit<RequestInit, 'body'>{
+    query?: Record<string, string>,
+    body?: Record<string, any>,
+    onRequest?: (params: OnRequestParamas) => void,
+    onRequestError?: (err: any) => void,
+    onResponse?: (res: Response) => void,
+    onResponseError?: (err: ResponseError) => void
 }
 
 /**
  * fetch
  */
-export const useFetch = (
+const useFetch = async (
     url: string,
-    option?: RequestInit,
-    timeout?: number,
+    fetchOption?: RequestOption
 ) => {
-    return new Promise<unknown>((resolve, reject) => {
 
-        const timer = timeout || 5000
+    const data = ref<any>(null)
+    const error = ref<any>(null)
 
-        // 请求超时
-        const timeoutId = setTimeout(() => {
-            reject(new Error("请求超时"));
-        }, timer);
+    const queryStr = new URLSearchParams(fetchOption?.query || {}).toString()
+    const fetchUrl = url + (queryStr ? '?' + queryStr : '')
+    let _body = null
 
-        // 有用户token就带上
-        if (option.headers) {
-            option.headers = {
-                ...option.headers,
-                'Authorization': 'Bearer ' + userStore.userToken,
+    if (fetchOption.method === 'POST') {
+        _body = JSON.stringify(fetchOption?.body || {})
+    }
+
+    fetchOption.onRequest?.({
+        url: fetchUrl,
+        headers: fetchOption.headers
+    })
+
+    try {
+        const fetchResponse = await fetch(
+            fetchUrl,
+            {
+                ...fetchOption,
+                body: _body,
+            }
+        )
+
+        if (fetchResponse.ok) {
+            const result = await fetchResponse.json().catch(() => fetchResponse.text())
+            data.value = result
+            fetchOption.onResponse?.(fetchResponse)
+        } else {
+            const errorResult = await fetchResponse.json().catch(() => fetchResponse.statusText)
+            error.value = {
+                status: fetchResponse.status,
+                statusText: fetchResponse.statusText,
+                data: errorResult
+            }
+            fetchOption.onResponseError?.(error.value)
+        }
+    } catch (err) {
+        error.value = err
+        fetchOption.onRequestError?.(err)
+    }
+
+    return {
+        data,
+        error
+    }
+}
+
+export const fetchData = async (
+    url: string,
+    fetchOption?: RequestOption
+) => {
+    const { userToken } = await getUserStore()
+
+    return await useFetch(
+        url,
+        {
+            ...fetchOption,
+            onRequest({ url, headers }) {
+                console.log('onRequest', url, headers)
+                if (userToken) {
+                    headers['Authorization'] = `Bearer ${userToken}`
+                }
             }
         }
-
-        fetch(API_URL + url, option)
-            .then(res => {
-                console.log(res);
-                
-                if (res.ok) {
-                    return res.json()
-                } else {
-                    const errCode = res.status
-                    MessagePlugin.error(httpErrCode[errCode] || '未知错误')
-                    reject(res.statusText)
-                }
-            })
-            .then(res => {
-                resolve(res)
-            })
-            .catch(err => {
-                MessagePlugin.error('网络错误')
-                reject(err)
-            })
-            .finally(() => {
-                clearTimeout(timeoutId)
-            })
-    })
+    )
 }
 
 
@@ -74,6 +107,7 @@ export const useFetch = (
  * axios
  */
 import axios from 'axios'
+import { RefSymbol } from '@vue/reactivity';
 // import { storeToRefs } from 'pinia'
 // import { useUserStore } from '../store/user'
 
