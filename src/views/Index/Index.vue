@@ -1,10 +1,5 @@
 <template>
-    <t-typography-title 
-        v-for="(item, index) in 6" 
-        :key="index"
-        :level="`h${item}`">
-        H{{item}}. TDesign
-    </t-typography-title>
+    <t-button>登录</t-button>
     {{ username }}
 </template>
 
