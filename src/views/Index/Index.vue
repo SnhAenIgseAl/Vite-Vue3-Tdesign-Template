@@ -1,6 +1,6 @@
 <template>
     <t-button>登录</t-button>
-    {{ username }}
+    <div class=" flex items-center justify-center">{{ username }}</div>
 </template>
 
 <script setup lang="ts">

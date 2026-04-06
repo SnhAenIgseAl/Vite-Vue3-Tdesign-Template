@@ -6,7 +6,7 @@ import { TDesignResolver } from '@tdesign-vue-next/auto-import-resolver';
 // import ElementPlus from 'unplugin-element-plus/vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
-
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -29,6 +29,7 @@ export default defineConfig({
         // ElementPlus({
         //     useSource: true
         // })
+        tailwindcss(),
     ],
 	resolve: {
         alias:{
